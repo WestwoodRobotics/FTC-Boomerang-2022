@@ -12,13 +12,15 @@ public class Intake extends OpMode {
     @Override
     public void init() {
         leftFinger = hardwareMap.get(Servo.class, "leftFinger");
-        rightFinger = hardwareMap.get(Servo.class, "rightFinger");
-        leftFinger.setPosition(0.5);
-        rightFinger.setPosition(0.5);
+        //rightFinger = hardwareMap.get(Servo.class, "rightFinger");
+        leftFinger.scaleRange(0.0, 1.0);
+        //rightFinger.scaleRange(0.0, 1.0);
     }
 
     @Override
     public void loop() {
+        leftFinger.setPosition(0.75);
+        //rightFinger.setPosition(0.5);
 
     }
 }
