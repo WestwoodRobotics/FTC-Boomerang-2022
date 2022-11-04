@@ -12,15 +12,35 @@ public class Intake extends OpMode {
     @Override
     public void init() {
         leftFinger = hardwareMap.get(Servo.class, "leftFinger");
-        //rightFinger = hardwareMap.get(Servo.class, "rightFinger");
+        rightFinger = hardwareMap.get(Servo.class, "rightFinger");
         leftFinger.scaleRange(0.0, 1.0);
-        //rightFinger.scaleRange(0.0, 1.0);
+        rightFinger.scaleRange(0.0, 1.0);
     }
 
+    double leftFingerPos = 0.25;
+    double rightFingerPos = 0.75;
     @Override
     public void loop() {
-        leftFinger.setPosition(0.75);
-        //rightFinger.setPosition(0.5);
+        if (gamepad1.x == true) {
+            leftFingerPos = 0.25;
+            rightFingerPos = 0.75;
+
+        }
+        else if (gamepad1.b == true) {
+            leftFingerPos = 0;
+            rightFingerPos = 1;
+        }
+//        else if (gamepad1.dpad_left == true) {
+//            telemetry.addData("left wheel pos: ", leftFingerPos);
+//            leftFingerPos-=0.0005;
+//        }
+//        else if (gamepad1.dpad_right == true) {
+//            telemetry.addData("right wheel pos: ", rightFingerPos);
+//            rightFingerPos+=0.0005;
+//        }
+        leftFinger.setPosition(leftFingerPos);
+        rightFinger.setPosition(rightFingerPos);
+        telemetry.update();
 
     }
 }
