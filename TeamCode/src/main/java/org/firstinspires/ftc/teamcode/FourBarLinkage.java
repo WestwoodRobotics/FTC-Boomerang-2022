@@ -25,6 +25,7 @@ public class FourBarLinkage extends LinearOpMode{
         while (opModeIsActive()) {
             double armPower = gamepad1.right_stick_y;
             arm.setPower(armPower);
+            //test
         }
     }
 }
