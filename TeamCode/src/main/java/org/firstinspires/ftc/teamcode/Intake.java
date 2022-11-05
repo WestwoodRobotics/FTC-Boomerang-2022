@@ -17,30 +17,21 @@ public class Intake extends OpMode {
         rightFinger.scaleRange(0.0, 1.0);
     }
 
-    double leftFingerPos = 0.25;
-    double rightFingerPos = 0.75;
+    double leftFingerPos = 0.75;
+    double rightFingerPos = 0.2;
     @Override
     public void loop() {
-        if (gamepad1.x == true) {
-            leftFingerPos = 0.25;
-            rightFingerPos = 0.75;
+        if (gamepad1.b == true) {
+            leftFingerPos = 0.75;
+            rightFingerPos = 0.2;
+        }
+        else if (gamepad1.x == true) {
+            leftFingerPos = 0.9;
+            rightFingerPos = 0.1;
+        }
 
-        }
-        else if (gamepad1.b == true) {
-            leftFingerPos = 0;
-            rightFingerPos = 1;
-        }
-//        else if (gamepad1.dpad_left == true) {
-//            telemetry.addData("left wheel pos: ", leftFingerPos);
-//            leftFingerPos-=0.0005;
-//        }
-//        else if (gamepad1.dpad_right == true) {
-//            telemetry.addData("right wheel pos: ", rightFingerPos);
-//            rightFingerPos+=0.0005;
-//        }
         leftFinger.setPosition(leftFingerPos);
         rightFinger.setPosition(rightFingerPos);
-        telemetry.update();
 
     }
 }
