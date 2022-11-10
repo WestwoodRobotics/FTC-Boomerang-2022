@@ -17,13 +17,13 @@ public class Intake extends OpMode {
         rightFinger.scaleRange(0.0, 1.0);
     }
 
-    double leftFingerPos = 0.75;
-    double rightFingerPos = 0.2;
+    double leftFingerPos = 0.25;
+    double rightFingerPos = 0.75;
     @Override
     public void loop() {
         if (gamepad1.b == true) {
-            leftFingerPos = 0.75;
-            rightFingerPos = 0.2;
+            leftFingerPos = 0.25;
+            rightFingerPos = 0.75;
         }
         else if (gamepad1.x == true) {
             leftFingerPos = 0.9;

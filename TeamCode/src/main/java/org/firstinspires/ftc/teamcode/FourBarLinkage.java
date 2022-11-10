@@ -15,17 +15,14 @@ public class FourBarLinkage extends LinearOpMode{
     public void runOpMode() {
         arm = hardwareMap.get(DcMotor.class, "arm");
 
-
-        //test comment
         arm.setDirection(DcMotor.Direction.REVERSE);
 
-
+        double armPower = 0;
         waitForStart();
 
         while (opModeIsActive()) {
-            double armPower = gamepad1.right_stick_y;
+            armPower = gamepad1.right_stick_y;
             arm.setPower(armPower);
-            //test
         }
     }
 }
