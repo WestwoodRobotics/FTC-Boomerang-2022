@@ -17,7 +17,6 @@ public class Auton extends LinearOpMode {
     DcMotor arm = null;
     public Servo leftFinger;
     public Servo rightFinger;
-    private ElapsedTime runtime = new ElapsedTime();
 
     final double frontRightPower = 0.5;
     final double frontLeftPower = 0.5;
@@ -51,10 +50,7 @@ public class Auton extends LinearOpMode {
         backLeft.setPower(backLeftPower);
         rightFinger.setPosition(rightFingerClose);
         leftFinger.setPosition(leftFingerClose);
-        runtime.reset();
-        while (opModeIsActive() && (runtime.seconds() < 3.0)) {
-            telemetry.update();
-        }
+        sleep(3000);
 
         frontRight.setPower(frontRightPower);
         frontLeft.setPower(frontLeftPower);
@@ -63,10 +59,7 @@ public class Auton extends LinearOpMode {
         arm.setPower(armPower);
         rightFinger.setPosition(rightFingerOpen);
         leftFinger.setPosition(leftFingerOpen);
-        runtime.reset();
-        while (opModeIsActive() && (runtime.seconds() < 2.0)) {
-            telemetry.update();
-        }
+        sleep(1000);
 
         frontRight.setPower(frontRightPower);
         frontLeft.setPower(frontLeftPower);
@@ -75,10 +68,7 @@ public class Auton extends LinearOpMode {
         arm.setPower(-armPower);
         rightFinger.setPosition(rightFingerClose);
         leftFinger.setPosition(leftFingerClose);
-        runtime.reset();
-        while (opModeIsActive() && (runtime.seconds() < 2.0)) {
-            telemetry.update();
-        }
+        sleep(3000);
 
         frontRight.setPower(0);
         frontLeft.setPower(0);
