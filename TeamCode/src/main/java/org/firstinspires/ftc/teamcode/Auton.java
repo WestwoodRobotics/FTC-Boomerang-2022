@@ -4,6 +4,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 
@@ -14,12 +15,19 @@ public class Auton extends LinearOpMode {
     DcMotor backRight = null;
     DcMotor backLeft = null;
     DcMotor arm = null;
+    public Servo leftFinger;
+    public Servo rightFinger;
     private ElapsedTime runtime = new ElapsedTime();
 
     final double frontRightPower = 0.5;
     final double frontLeftPower = 0.5;
     final double backRightPower = 0.5;
     final double backLeftPower = 0.5;
+    final double armPower = 0.5;
+    final double leftFingerClose = 0.25;
+    final double rightFingerClose = 0.75;
+    final double leftFingerOpen = 0.9;
+    final double rightFingerOpen = 0.1;
     @Override
 
     public void runOpMode() {
@@ -41,6 +49,8 @@ public class Auton extends LinearOpMode {
         frontLeft.setPower(frontLeftPower);
         backRight.setPower(backRightPower);
         backLeft.setPower(backLeftPower);
+        rightFinger.setPosition(rightFingerClose);
+        leftFinger.setPosition(leftFingerClose);
         runtime.reset();
         while (opModeIsActive() && (runtime.seconds() < 3.0)) {
             telemetry.update();
@@ -50,8 +60,11 @@ public class Auton extends LinearOpMode {
         frontLeft.setPower(frontLeftPower);
         backRight.setPower(backRightPower);
         backLeft.setPower(backLeftPower);
+        arm.setPower(armPower);
+        rightFinger.setPosition(rightFingerOpen);
+        leftFinger.setPosition(leftFingerOpen);
         runtime.reset();
-        while (opModeIsActive() && (runtime.seconds() < 1.3)) {
+        while (opModeIsActive() && (runtime.seconds() < 2.0)) {
             telemetry.update();
         }
 
@@ -59,8 +72,11 @@ public class Auton extends LinearOpMode {
         frontLeft.setPower(frontLeftPower);
         backRight.setPower(backRightPower);
         backLeft.setPower(backLeftPower);
+        arm.setPower(-armPower);
+        rightFinger.setPosition(rightFingerClose);
+        leftFinger.setPosition(leftFingerClose);
         runtime.reset();
-        while (opModeIsActive() && (runtime.seconds() < 1.0)) {
+        while (opModeIsActive() && (runtime.seconds() < 2.0)) {
             telemetry.update();
         }
 
