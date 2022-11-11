@@ -32,6 +32,8 @@ public class Intake extends OpMode {
 
         leftFinger.setPosition(leftFingerPos);
         rightFinger.setPosition(rightFingerPos);
+        telemetry.addData("left finger pos", leftFinger.getPosition());
+        telemetry.addData("right finger pos", rightFinger.getPosition());
 
     }
 }
