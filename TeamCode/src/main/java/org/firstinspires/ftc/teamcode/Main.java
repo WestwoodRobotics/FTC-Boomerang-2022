@@ -47,8 +47,8 @@ public class Main extends OpMode {
     double backRightPower = 0;
     double backLeftPower = 0;
     double armPower = 0;
-    double leftFingerPos = 0.5;
-    double rightFingerPos = 0.5;
+    double leftFingerPos = 0.9;
+    double rightFingerPos = 0.1;
 
     @Override
     public void loop() {
@@ -78,8 +78,15 @@ public class Main extends OpMode {
         rightFinger.setPosition(rightFingerPos);
         telemetry.addData("left finger pos", leftFinger.getPosition());
         telemetry.addData("right finger pos", rightFinger.getPosition());
-
-        armPower = -gamepad1.right_trigger * 0.25;
+        if (gamepad1.right_trigger == 1) {
+            armPower = gamepad1.right_trigger * 0.5;
+        }
+        else if (gamepad1.left_trigger == 1) {
+            armPower = -gamepad1.left_trigger * 0.03;
+        }
+        else {
+            armPower = 0;
+        }
         arm.setPower(armPower);
     }
 }

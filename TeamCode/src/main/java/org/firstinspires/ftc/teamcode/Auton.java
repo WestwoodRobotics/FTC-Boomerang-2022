@@ -22,11 +22,7 @@ public class Auton extends LinearOpMode {
     final double frontLeftPower = 0.5;
     final double backRightPower = 0.5;
     final double backLeftPower = 0.5;
-    final double armPower = 0.5;
-    final double leftFingerClose = 0.25;
-    final double rightFingerClose = 0.75;
-    final double leftFingerOpen = 0.9;
-    final double rightFingerOpen = 0.1;
+
     @Override
 
     public void runOpMode() {
@@ -44,31 +40,12 @@ public class Auton extends LinearOpMode {
 
         waitForStart();
 
-        frontRight.setPower(frontRightPower);
-        frontLeft.setPower(frontLeftPower);
-        backRight.setPower(backRightPower);
-        backLeft.setPower(backLeftPower);
-        rightFinger.setPosition(rightFingerClose);
-        leftFinger.setPosition(leftFingerClose);
-        sleep(3000);
 
         frontRight.setPower(frontRightPower);
-        frontLeft.setPower(frontLeftPower);
-        backRight.setPower(backRightPower);
+        frontLeft.setPower(-frontLeftPower);
+        backRight.setPower(-backRightPower);
         backLeft.setPower(backLeftPower);
-        arm.setPower(armPower);
-        rightFinger.setPosition(rightFingerOpen);
-        leftFinger.setPosition(leftFingerOpen);
         sleep(1000);
-
-        frontRight.setPower(frontRightPower);
-        frontLeft.setPower(frontLeftPower);
-        backRight.setPower(backRightPower);
-        backLeft.setPower(backLeftPower);
-        arm.setPower(-armPower);
-        rightFinger.setPosition(rightFingerClose);
-        leftFinger.setPosition(leftFingerClose);
-        sleep(3000);
 
         frontRight.setPower(0);
         frontLeft.setPower(0);
