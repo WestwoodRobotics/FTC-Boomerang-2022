@@ -3,43 +3,47 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Servo;
 
 @TeleOp
 public class Main extends OpMode {
     public Servo leftFinger = null;
     public Servo rightFinger = null;
-    public DcMotor frontRight = null;
-    public DcMotor frontLeft = null;
-    public DcMotor backRight = null;
-    public DcMotor backLeft = null;
-    public DcMotor arm = null;
-
-
+    public DcMotorEx frontRight = null;
+    public DcMotorEx frontLeft = null;
+    public DcMotorEx backRight = null;
+    public DcMotorEx backLeft = null;
+    public DcMotorEx slide = null;
+    private final int smallJunction = 1599;
+    private final int mediumJunction = 3548;
+    private final int highJunction = 5500; //TWEAK THIS VALUE IF NECESSARY
     @Override
     public void init() {
-        frontRight = hardwareMap.get(DcMotor.class, "frontRight");
-        frontLeft = hardwareMap.get(DcMotor.class, "frontLeft");
-        backRight = hardwareMap.get(DcMotor.class, "backRight");
-        backLeft = hardwareMap.get(DcMotor.class, "backLeft");
+        frontRight = hardwareMap.get(DcMotorEx.class, "frontRight");
+        frontLeft = hardwareMap.get(DcMotorEx.class, "frontLeft");
+        backRight = hardwareMap.get(DcMotorEx.class, "backRight");
+        backLeft = hardwareMap.get(DcMotorEx.class, "backLeft");
 
-        frontRight.setDirection(DcMotor.Direction.REVERSE);
-        frontLeft.setDirection(DcMotor.Direction.FORWARD);
-        backRight.setDirection(DcMotor.Direction.REVERSE);
-        backLeft.setDirection(DcMotor.Direction.FORWARD);
-        frontRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        frontLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        backRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        backLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        frontRight.setDirection(DcMotorEx.Direction.REVERSE);
+        frontLeft.setDirection(DcMotorEx.Direction.FORWARD);
+        backRight.setDirection(DcMotorEx.Direction.REVERSE);
+        backLeft.setDirection(DcMotorEx.Direction.FORWARD);
+        frontRight.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
+        frontLeft.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
+        backRight.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
+        backLeft.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
 
         leftFinger = hardwareMap.get(Servo.class, "leftFinger");
         rightFinger = hardwareMap.get(Servo.class, "rightFinger");
         leftFinger.scaleRange(0.0, 1.0);
         rightFinger.scaleRange(0.0, 1.0);
 
-        arm = hardwareMap.get(DcMotor.class, "arm");
-        arm.setDirection(DcMotor.Direction.REVERSE);
-        arm.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        slide = hardwareMap.get(DcMotorEx.class, "arm");
+        slide.setDirection(DcMotorEx.Direction.REVERSE);
+        slide.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
+        slide.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+        slide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
     }
 
     double frontRightPower = 0;
@@ -49,21 +53,22 @@ public class Main extends OpMode {
     double armPower = 0;
     double leftFingerPos = 0.9;
     double rightFingerPos = 0.1;
+    int target = 0;
+    int current = 0;
 
     @Override
     public void loop() {
         double drive = gamepad1.left_stick_y;
         double strafe = -gamepad1.left_stick_x;
         double turn = gamepad1.right_stick_x;
-        frontRightPower = drive - strafe - turn;
-        frontLeftPower = drive + strafe + turn;
-        backRightPower = drive + strafe - turn;
-        backLeftPower = drive - strafe + turn;
-        //test comment
-        frontRight.setPower(frontRightPower*0.5);
-        frontLeft.setPower(frontLeftPower*0.5);
-        backRight.setPower(backRightPower*0.5);
-        backLeft.setPower(backLeftPower*0.5);
+        frontRightPower = drive + strafe - turn;
+        frontLeftPower = drive - strafe + turn;
+        backRightPower = drive - strafe - turn;
+        backLeftPower = drive + strafe + turn;
+        frontRight.setPower(frontRightPower*0.75);
+        frontLeft.setPower(frontLeftPower*0.75);
+        backRight.setPower(backRightPower*0.75);
+        backLeft.setPower(backLeftPower*0.75);
 
         if (gamepad1.right_bumper == true) {
             leftFingerPos = 0.5;
@@ -74,20 +79,45 @@ public class Main extends OpMode {
             rightFingerPos = 0.1;
         }
 
+
+        if (gamepad1.right_trigger > 0 || gamepad1.left_trigger > 0) {
+            if (gamepad1.right_trigger > 0) {
+                target += 28;
+            }
+            else if (gamepad1.left_trigger > 0) {
+                target -= 28;
+            }
+        }
+
+        else {
+            if (gamepad1.a) {
+                target = smallJunction;
+            }
+            else if (gamepad1.b) {
+                target = mediumJunction;
+            }
+            else if (gamepad1.y) {
+                target = highJunction;
+            }
+        }
+        slide.setTargetPosition(target);
+        slide.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
+        current = slide.getCurrentPosition();
+        if (target > current) {
+            slide.setPower(.5);
+        }
+        else if (current > target) {
+            slide.setPower(-.5);
+        }
+        else if (current == target) {
+            slide.setPower(0);
+        }
+
         leftFinger.setPosition(leftFingerPos);
         rightFinger.setPosition(rightFingerPos);
-        telemetry.addData("left finger pos", leftFinger.getPosition());
-        telemetry.addData("right finger pos", rightFinger.getPosition());
-        if (gamepad1.right_trigger == 1) {
-            armPower = gamepad1.right_trigger * 0.5;
-        }
-        else if (gamepad1.left_trigger == 1) {
-            armPower = -gamepad1.left_trigger * 0.03;
-        }
-        else {
-            armPower = 0;
-        }
-        arm.setPower(armPower);
+        //telemetry.addData("left finger pos", leftFinger.getPosition());
+        //telemetry.addData("right finger pos", rightFinger.getPosition());
+
     }
 }
 
