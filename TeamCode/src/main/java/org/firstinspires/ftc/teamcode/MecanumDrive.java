@@ -36,17 +36,17 @@ public class MecanumDrive extends LinearOpMode{
 
             while (opModeIsActive()) {
                 double drive = gamepad1.left_stick_y;
-                double strafe = -gamepad1.left_stick_x;
+                double strafe = gamepad1.left_stick_x;
                 double turn = gamepad1.right_stick_x;
-                frontRightPower = drive - strafe - turn;
-                frontLeftPower = drive + strafe + turn;
-                backRightPower = drive + strafe - turn;
-                backLeftPower = drive - strafe + turn;
+                frontRightPower = drive + strafe - turn;
+                frontLeftPower = drive - strafe + turn;
+                backRightPower = drive - strafe - turn;
+                backLeftPower = drive + strafe + turn;
 
-                frontRight.setPower(frontRightPower);
-                frontLeft.setPower(frontLeftPower);
-                backRight.setPower(backRightPower);
-                backLeft.setPower(backLeftPower);
+                frontRight.setPower(frontRightPower * 0.75);
+                frontLeft.setPower(frontLeftPower * 0.75);
+                backRight.setPower(backRightPower * 0.75);
+                backLeft.setPower(backLeftPower * 0.75);
             }
         }
     }
