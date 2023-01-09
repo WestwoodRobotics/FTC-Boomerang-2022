@@ -15,9 +15,9 @@ public class Main extends OpMode {
     public DcMotorEx backRight = null;
     public DcMotorEx backLeft = null;
     public DcMotorEx slide = null;
-    private final int smallJunction = 1599;
-    private final int mediumJunction = 3548;
-    private final int highJunction = 5500; //TWEAK THIS VALUE IF NECESSARY
+    private final int smallJunction = 1300;
+    private final int mediumJunction = 3000;
+    private final int highJunction = 4700;
     @Override
     public void init() {
         frontRight = hardwareMap.get(DcMotorEx.class, "frontRight");
@@ -39,7 +39,7 @@ public class Main extends OpMode {
         leftFinger.scaleRange(0.0, 1.0);
         rightFinger.scaleRange(0.0, 1.0);
 
-        slide = hardwareMap.get(DcMotorEx.class, "arm");
+        slide = hardwareMap.get(DcMotorEx.class, "slide");
         slide.setDirection(DcMotorEx.Direction.REVERSE);
         slide.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
         slide.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
@@ -50,7 +50,6 @@ public class Main extends OpMode {
     double frontLeftPower = 0;
     double backRightPower = 0;
     double backLeftPower = 0;
-    double armPower = 0;
     double leftFingerPos = 0.9;
     double rightFingerPos = 0.1;
     int target = 0;
@@ -58,8 +57,8 @@ public class Main extends OpMode {
 
     @Override
     public void loop() {
-        double drive = gamepad1.left_stick_y;
-        double strafe = -gamepad1.left_stick_x;
+        double drive = -gamepad1.left_stick_x;
+        double strafe = -gamepad1.left_stick_y;
         double turn = gamepad1.right_stick_x;
         frontRightPower = drive + strafe - turn;
         frontLeftPower = drive - strafe + turn;
@@ -70,33 +69,33 @@ public class Main extends OpMode {
         backRight.setPower(backRightPower*0.75);
         backLeft.setPower(backLeftPower*0.75);
 
-        if (gamepad1.right_bumper == true) {
+        if (gamepad2.right_bumper == true) {
             leftFingerPos = 0.5;
             rightFingerPos = 0.5;
         }
-        else if (gamepad1.left_bumper== true) {
+        else if (gamepad2.left_bumper== true) {
             leftFingerPos = 0.9;
             rightFingerPos = 0.1;
         }
 
 
-        if (gamepad1.right_trigger > 0 || gamepad1.left_trigger > 0) {
-            if (gamepad1.right_trigger > 0) {
-                target += 28;
+        if (gamepad2.right_trigger > 0 || gamepad2.left_trigger > 0) {
+            if (gamepad2.right_trigger > 0) {
+                target += 20;
             }
-            else if (gamepad1.left_trigger > 0) {
-                target -= 28;
+            else if (gamepad2.left_trigger > 0) {
+                target -= 20;
             }
         }
 
         else {
-            if (gamepad1.a) {
+            if (gamepad2.a) {
                 target = smallJunction;
             }
-            else if (gamepad1.b) {
+            else if (gamepad2.b) {
                 target = mediumJunction;
             }
-            else if (gamepad1.y) {
+            else if (gamepad2.y) {
                 target = highJunction;
             }
         }
