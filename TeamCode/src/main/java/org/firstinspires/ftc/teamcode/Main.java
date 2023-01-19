@@ -15,9 +15,10 @@ public class Main extends OpMode {
     public DcMotorEx backRight = null;
     public DcMotorEx backLeft = null;
     public DcMotorEx slide = null;
-    private final int smallJunction = 1300;
-    private final int mediumJunction = 3000;
-    private final int highJunction = 4700;
+    //EDIT THESE VALUES FOR SET POSITION
+    private final int smallJunction = 2500;
+    private final int mediumJunction = 4200;
+    private final int highJunction = 5700;
     @Override
     public void init() {
         frontRight = hardwareMap.get(DcMotorEx.class, "frontRight");
@@ -54,6 +55,8 @@ public class Main extends OpMode {
     double rightFingerPos = 0.1;
     int target = 0;
     int current = 0;
+    double slowmode = 1;
+    boolean slow_on = false;
 
     @Override
     public void loop() {
@@ -64,39 +67,56 @@ public class Main extends OpMode {
         frontLeftPower = drive - strafe + turn;
         backRightPower = drive - strafe - turn;
         backLeftPower = drive + strafe + turn;
-        frontRight.setPower(frontRightPower*0.75);
-        frontLeft.setPower(frontLeftPower*0.75);
-        backRight.setPower(backRightPower*0.75);
-        backLeft.setPower(backLeftPower*0.75);
+        frontRight.setPower(frontRightPower*slowmode);
+        frontLeft.setPower(frontLeftPower*slowmode);
+        backRight.setPower(backRightPower*slowmode);
+        backLeft.setPower(backLeftPower*slowmode);
+        //slowmode
+        if (gamepad1.a || slide.getCurrentPosition() >= 6000) {
+            if (slow_on) {
+                slow_on = false;
+                slowmode = 1;
+            }
 
-        if (gamepad2.right_bumper == true) {
-            leftFingerPos = 0.5;
-            rightFingerPos = 0.5;
+            else {
+                slow_on = true;
+                slowmode = 0.5;
+            }
         }
-        else if (gamepad2.left_bumper== true) {
+
+        //gamepad 2 stuff
+        //SERVO POSITIONS (CHANGE THE FINGERS IF IT DOESN'T OPEN OR CLOSE ON TIME)
+        if (gamepad2.right_bumper == true) { //change
+            leftFingerPos = 0.4;
+            rightFingerPos = 0.6;
+        }
+        else if (gamepad2.left_bumper== true) { //change
             leftFingerPos = 0.9;
             rightFingerPos = 0.1;
         }
 
-
-        if (gamepad2.right_trigger > 0 || gamepad2.left_trigger > 0) {
-            if (gamepad2.right_trigger > 0) {
+        //INCREASE VALUES 
+        if (gamepad2.right_trigger > 0 || gamepad2.left_trigger > 0) { //change
+            if (gamepad2.right_trigger > 0) { //change
                 target += 20;
             }
-            else if (gamepad2.left_trigger > 0) {
+            else if (gamepad2.left_trigger > 0) { //change
                 target -= 20;
             }
         }
 
         else {
-            if (gamepad2.a) {
+            if (gamepad2.a) { //change
                 target = smallJunction;
             }
-            else if (gamepad2.b) {
+            else if (gamepad2.b) { //change
                 target = mediumJunction;
             }
-            else if (gamepad2.y) {
+            else if (gamepad2.y) { //change
                 target = highJunction;
+            }
+            else if (gamepad2.x) { // change
+                target = 0;
             }
         }
         slide.setTargetPosition(target);
@@ -106,17 +126,16 @@ public class Main extends OpMode {
             slide.setPower(.5);
         }
         else if (current > target) {
-            slide.setPower(-.5);
+            slide.setPower(-0.8);
         }
         else if (current == target) {
             slide.setPower(0);
         }
 
+
         leftFinger.setPosition(leftFingerPos);
         rightFinger.setPosition(rightFingerPos);
-        //telemetry.addData("left finger pos", leftFinger.getPosition());
-        //telemetry.addData("right finger pos", rightFinger.getPosition());
-
+        telemetry.addData("slide pos", slide.getCurrentPosition());
     }
 }
 
