@@ -103,6 +103,11 @@ public class RoadrunnerAuton extends LinearOpMode {
                     slide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                     slide.setPower(-1);
                 })
+                .addTemporalMarker(13, () -> {
+                    slide.setTargetPosition(1700);
+                    slide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                    slide.setPower(-1);
+                })
 
                 .build();
         Trajectory left = drive.trajectoryBuilder(myTrajectory.end())
