@@ -104,9 +104,9 @@ public class RoadrunnerAuton extends LinearOpMode {
                     slide.setPower(-1);
                 })
                 .addTemporalMarker(13, () -> {
-                    slide.setTargetPosition(1700);
+                    slide.setTargetPosition(0);
                     slide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                    slide.setPower(-1);
+                    slide.setPower(1);
                 })
 
                 .build();
