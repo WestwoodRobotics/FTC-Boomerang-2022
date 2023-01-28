@@ -7,7 +7,7 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Servo;
 
 @TeleOp
-public class Main extends OpMode {
+public class OneGamepad extends OpMode {
     public Servo leftFinger = null;
     public Servo rightFinger = null;
     public DcMotorEx frontRight = null;
@@ -71,26 +71,14 @@ public class Main extends OpMode {
         frontLeft.setPower(frontLeftPower*slowmode);
         backRight.setPower(backRightPower*slowmode);
         backLeft.setPower(backLeftPower*slowmode);
-        //slowmode
-        if (gamepad1.a || slide.getCurrentPosition() >= 6000) {
-            if (slow_on) {
-                slow_on = false;
-                slowmode = 1;
-            }
-
-            else {
-                slow_on = true;
-                slowmode = 0.5;
-            }
-        }
 
         //gamepad 2 stuff
         //SERVO POSITIONS (CHANGE THE FINGERS IF IT DOESN'T OPEN OR CLOSE ON TIME)
-        if (gamepad2.right_bumper == true) { //change
+        if (gamepad1.right_bumper == true) { //change
             leftFingerPos = 0.4;
             rightFingerPos = 0.6;
         }
-        else if (gamepad2.left_bumper== true) { //change
+        else if (gamepad1.left_bumper== true) { //change
             leftFingerPos = 0.9;
             rightFingerPos = 0.1;
         }
@@ -102,27 +90,27 @@ public class Main extends OpMode {
             target = 0;
         }
 
-        //INCREASE VALUES 
-        if (gamepad2.right_trigger > 0 || gamepad2.left_trigger > 0) { //change
-            if (gamepad2.right_trigger > 0) { //change
+        //INCREASE VALUES
+        if (gamepad1.right_trigger > 0 || gamepad1.left_trigger > 0) { //change
+            if (gamepad1.right_trigger > 0) { //change
                 target += 20;
             }
-            else if (gamepad2.left_trigger > 0) { //change
+            else if (gamepad1.left_trigger > 0) { //change
                 target -= 20;
             }
         }
 
         else {
-            if (gamepad2.a) { //change
+            if (gamepad1.a) { //change
                 target = smallJunction;
             }
-            else if (gamepad2.b) { //change
+            else if (gamepad1.b) { //change
                 target = mediumJunction;
             }
-            else if (gamepad2.y) { //change
+            else if (gamepad1.y) { //change
                 target = highJunction;
             }
-            else if (gamepad2.x) { // change
+            else if (gamepad1.x) { // change
                 target = 0;
             }
         }

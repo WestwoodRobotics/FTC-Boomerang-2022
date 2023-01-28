@@ -1,33 +1,32 @@
-package org.firstinspires.ftc.teamcode.auton;
+package org.firstinspires.ftc.teamcode;
+import com.acmerobotics.roadrunner.trajectory.TrajectoryBuilder;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.AprilTagDetectionPipeline;
+import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 import org.openftc.apriltag.AprilTagDetection;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 import java.util.ArrayList;
+import com.acmerobotics.roadrunner.geometry.Pose2d;
+import com.acmerobotics.roadrunner.trajectory.Trajectory;
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
+import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 @Autonomous
-public class AprilTagAutonomousInitDetection extends LinearOpMode {
-    //INTRODUCE VARIABLES HERE
-    private ElapsedTime runtime = new ElapsedTime();
-    public Servo leftFinger = null;
-    public Servo rightFinger = null;
-    public DcMotor slide = null;
-    DcMotor frontRight = null;
-    DcMotor frontLeft = null;
-    DcMotor backRight = null;
-    DcMotor backLeft = null;
-
+public class RoadrunnerAuton extends LinearOpMode {
     OpenCvCamera camera;
     AprilTagDetectionPipeline aprilTagDetectionPipeline;
     static final double FEET_PER_METER = 3.28084;
+    public Servo leftFinger = null;
+    public Servo rightFinger = null;
+    public DcMotor slide = null;
     // Lens intrinsics
     // UNITS ARE PIXELS
     // NOTE: this calibration is for the C920 webcam at 800x448.
@@ -49,49 +48,72 @@ public class AprilTagAutonomousInitDetection extends LinearOpMode {
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         camera = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
         aprilTagDetectionPipeline = new AprilTagDetectionPipeline(tagsize, fx, fy, cx, cy);
-        camera.setPipeline(aprilTagDetectionPipeline);
-        camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
-            @Override
-            public void onOpened() {
-                camera.startStreaming(800,448, OpenCvCameraRotation.UPRIGHT);
-            }
-            @Override
-            public void onError(int errorCode) {}});
-        telemetry.setMsTransmissionInterval(50);
-
-        //HARDWARE MAPPING HERE etc.
-        frontRight = hardwareMap.get(DcMotor.class, "frontRight");
-        frontLeft = hardwareMap.get(DcMotor.class, "frontLeft");
-        backRight = hardwareMap.get(DcMotor.class, "backRight");
-        backLeft = hardwareMap.get(DcMotor.class, "backLeft");
-
-        frontRight.setDirection(DcMotor.Direction.FORWARD);
-        frontLeft.setDirection(DcMotor.Direction.REVERSE);
-        backRight.setDirection(DcMotor.Direction.FORWARD);
-        backLeft.setDirection(DcMotor.Direction.REVERSE);
-
         leftFinger = hardwareMap.get(Servo.class, "leftFinger");
         rightFinger = hardwareMap.get(Servo.class, "rightFinger");
         leftFinger.scaleRange(0.0, 1.0);
         rightFinger.scaleRange(0.0, 1.0);
-
-        //Zero Power Behavior: full break when motor input = 0;
-        frontRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        frontLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        backRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        backLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-
         slide = hardwareMap.get(DcMotor.class, "slide");
         slide.setDirection(DcMotor.Direction.REVERSE);
         slide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         slide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         slide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        camera.setPipeline(aprilTagDetectionPipeline);
+        camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
+            @Override
+            public void onOpened() {
+                camera.startStreaming(800, 448, OpenCvCameraRotation.UPRIGHT);
+            }
 
-        /* The INIT-loop: This REPLACES waitForStart!*/
-        leftFinger.setPosition(0.4);
-        rightFinger.setPosition(0.6);
-        slide.setPower(0.5);
-        sleep(1000);
+            @Override
+            public void onError(int errorCode) {
+            }
+        });
+        telemetry.setMsTransmissionInterval(50);
+
+        SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
+
+        TrajectorySequence myTrajectory = drive.trajectorySequenceBuilder(new Pose2d())
+                .addTemporalMarker(0, () -> {
+                    leftFinger.setPosition(0.4);
+                    rightFinger.setPosition(0.6);
+                })
+                .addTemporalMarker(1, () -> {
+                    slide.setTargetPosition(2500);
+                    slide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                    slide.setPower(-1);
+                })
+                .forward(49)
+                .strafeRight(8)
+                .addTemporalMarker(3.75, () -> {
+                    leftFinger.setPosition(0.9);
+                    rightFinger.setPosition(0.1);
+                    slide.setTargetPosition(1000);
+                    slide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                    slide.setPower(1);
+                })
+                .strafeLeft(8)
+                .forward(14)
+                .strafeRight(40)
+                .addTemporalMarker(8, () -> {
+                    leftFinger.setPosition(0.4);
+                    rightFinger.setPosition(0.6);
+                })
+                .addTemporalMarker(10, () -> {
+                    slide.setTargetPosition(1700);
+                    slide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                    slide.setPower(-1);
+                })
+
+                .build();
+        Trajectory left = drive.trajectoryBuilder(myTrajectory.end())
+                        .strafeLeft(60)
+                        .build();
+        Trajectory middle = drive.trajectoryBuilder(myTrajectory.end())
+                .strafeLeft(30)
+                .build();
+        Trajectory right = drive.trajectoryBuilder(myTrajectory.end())
+                .strafeLeft(10)
+                .build();
         while (!isStarted() && !isStopRequested()){
             ArrayList<AprilTagDetection> currentDetections = aprilTagDetectionPipeline.getLatestDetections();
             if(currentDetections.size() != 0) {
@@ -141,83 +163,14 @@ public class AprilTagAutonomousInitDetection extends LinearOpMode {
             telemetry.addLine("No tag snapshot available, it was never sighted during the init loop :(");
             telemetry.update();
         }
+        String parking = "";
 
-        //PUT AUTON CODE HERE (DRIVER PRESSED THE PLAY BUTTON!)
-        //EDIT STUFF HERE
         if(tagOfInterest.id == LEFT) { //ONE
-            //FORWARD
-            frontRight.setPower(-0.75);
-            frontLeft.setPower(-0.75);
-            backRight.setPower(-0.75);
-            backLeft.setPower(-0.75);
-            runtime.reset();
-            sleep(900);
-
-            frontRight.setPower(0);
-            frontLeft.setPower(0);
-            backRight.setPower(0);
-            backLeft.setPower(0);
-            sleep(200);
-
-            //LEFT
-            frontRight.setPower(0.75);
-            frontLeft.setPower(-0.75);
-            backRight.setPower(-0.75);
-            backLeft.setPower(0.75);
-            sleep(900);
-
-            frontRight.setPower(0);
-            frontLeft.setPower(0);
-            backRight.setPower(0);
-            backLeft.setPower(0);
-
-            telemetry.addData("Path", "Complete");
-            telemetry.update();
-            sleep(1000);
-
+            parking = "left";
         } else if (tagOfInterest.id == MIDDLE) { //TWO
-            //FORWARD
-            frontRight.setPower(-0.75);
-            frontLeft.setPower(-0.75);
-            backRight.setPower(-0.75);
-            backLeft.setPower(-0.75);
-            sleep(900);
-
-            frontRight.setPower(0);
-            frontLeft.setPower(0);
-            backRight.setPower(0);
-            backLeft.setPower(0);
-
-            telemetry.addData("Path", "Complete");
-            telemetry.update();
-            sleep(1000);
-
+            parking = "middle";
         } else if (tagOfInterest.id == RIGHT) { //THREE
-            //FORWARD
-            frontRight.setPower(-0.75);
-            frontLeft.setPower(-0.75);
-            backRight.setPower(-0.75);
-            backLeft.setPower(-0.75);
-            runtime.reset();
-            sleep(900);
-
-            frontRight.setPower(0);
-            frontLeft.setPower(0);
-            backRight.setPower(0);
-            backLeft.setPower(0);
-            sleep(200);
-
-            //RIGHT
-            frontRight.setPower(-0.75);
-            frontLeft.setPower(0.75);
-            backRight.setPower(0.75);
-            backLeft.setPower(-0.75);
-            sleep(900);
-
-            frontRight.setPower(0);
-            frontLeft.setPower(0);
-            backRight.setPower(0);
-            backLeft.setPower(0);
+            parking = "right";
 
             telemetry.addData("Path", "Complete");
             telemetry.update();
@@ -226,18 +179,27 @@ public class AprilTagAutonomousInitDetection extends LinearOpMode {
             telemetry.addLine("No tag snapshot available, it was never sighted during the init loop :(");
             telemetry.update();
         }
+        if(isStopRequested()) return;
 
+        drive.followTrajectorySequence(myTrajectory);
+        if (parking == "left") {
+            drive.followTrajectory(left);
+        }
+        else if (parking == "right") {
+            drive.followTrajectory(right);
+        }
+        else if (parking == "middle") {
+            drive.followTrajectory(middle);
+        }
     }
 
-    void tagToTelemetry(AprilTagDetection detection)
-    {
+    void tagToTelemetry(AprilTagDetection detection) {
         telemetry.addLine(String.format("\nDetected tag ID=%d", detection.id));
-        telemetry.addLine(String.format("Translation X: %.2f feet", detection.pose.x*FEET_PER_METER));
-        telemetry.addLine(String.format("Translation Y: %.2f feet", detection.pose.y*FEET_PER_METER));
-        telemetry.addLine(String.format("Translation Z: %.2f feet", detection.pose.z*FEET_PER_METER));
+        telemetry.addLine(String.format("Translation X: %.2f feet", detection.pose.x * FEET_PER_METER));
+        telemetry.addLine(String.format("Translation Y: %.2f feet", detection.pose.y * FEET_PER_METER));
+        telemetry.addLine(String.format("Translation Z: %.2f feet", detection.pose.z * FEET_PER_METER));
         telemetry.addLine(String.format("Rotation Yaw: %.2f degrees", Math.toDegrees(detection.pose.yaw)));
         telemetry.addLine(String.format("Rotation Pitch: %.2f degrees", Math.toDegrees(detection.pose.pitch)));
         telemetry.addLine(String.format("Rotation Roll: %.2f degrees", Math.toDegrees(detection.pose.roll)));
     }
 }
-
